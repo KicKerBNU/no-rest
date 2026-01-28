@@ -9,9 +9,9 @@ import dotenv from 'dotenv';
 // Load environment variables from .env
 dotenv.config();
 
-const FORUM_API_URL = process.env.FORUM_URL?.endsWith('.json')
-  ? process.env.FORUM_URL
-  : `${process.env.FORUM_URL || 'https://forum.norestforthewicked.com/c/no-rest-for-the-wicked/5'}.json`;
+// Constants - these are public configuration values, not secrets
+const FORUM_URL = 'https://forum.norestforthewicked.com/c/no-rest-for-the-wicked/5';
+const FORUM_API_URL = `${FORUM_URL}.json`;
 
 async function fetchLatestTopic() {
   console.log('📡 Fetching latest topic from forum...');

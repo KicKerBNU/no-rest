@@ -5,15 +5,9 @@
 
 import axios from 'axios';
 
-// Get forum URL from environment variable (set in Netlify dashboard)
-// This is a public URL, not a secret
-const FORUM_URL = process.env.FORUM_URL;
-if (!FORUM_URL) {
-  throw new Error('FORUM_URL environment variable is required');
-}
-const FORUM_API_URL = FORUM_URL.endsWith('.json')
-  ? FORUM_URL
-  : `${FORUM_URL}.json`;
+// Constants - these are public configuration values, not secrets
+const FORUM_URL = 'https://forum.norestforthewicked.com/c/no-rest-for-the-wicked/5';
+const FORUM_API_URL = `${FORUM_URL}.json`;
 
 async function fetchLatestTopic() {
   const response = await axios.get(FORUM_API_URL, {
