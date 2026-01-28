@@ -129,7 +129,8 @@ export default async function handler(req) {
   }
 }
 
-// Run daily at 12:00 UTC
+// Run daily at 19:30 Brasilia time (22:30 UTC)
+// Brasilia timezone is UTC-3, so 19:30 BRT = 22:30 UTC
 export const config = {
-  schedule: '@daily',
+  schedule: '30 22 * * *', // 22:30 UTC = 19:30 Brasilia time
 };
