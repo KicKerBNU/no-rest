@@ -1,0 +1,6 @@
+# Exclude local bot code from Netlify builds
+# Only the netlify/functions folder is needed for deployment
+src/
+test-function.mjs
+*.ts
+tsconfig.json
