@@ -35,9 +35,9 @@ A Discord bot that monitors the No Rest For The Wicked forum and automatically p
    ```env
    DISCORD_TOKEN=your_discord_bot_token_here
    DISCORD_CHANNEL_ID=your_discord_channel_id_here
-   FORUM_URL=https://forum.norestforthewicked.com/c/no-rest-for-the-wicked/5
-   CHECK_INTERVAL=86400000
    ```
+   
+   **Note:** `FORUM_URL` and `CHECK_INTERVAL` are now hardcoded constants in the code (not secrets, so no need for env vars).
 
 ### Getting Discord Bot Token
 
@@ -117,7 +117,8 @@ You can run the same logic as a **scheduled serverless function** on Netlify (no
 3. **Set environment variables** (Site settings → Environment variables):
    - `DISCORD_TOKEN` – your Discord bot token
    - `DISCORD_CHANNEL_ID` – target channel ID
-   - `FORUM_URL` – (optional) `https://forum.norestforthewicked.com/c/no-rest-for-the-wicked/5`
+   
+   **Note:** `FORUM_URL` is hardcoded in the function code (it's a public URL, not a secret).
 
 4. **Deploy.** The function `post-latest-topic` runs **once per day** (at midnight UTC). You can change the schedule in `netlify/functions/post-latest-topic.mjs` (`config.schedule`, e.g. `@daily`, `@hourly`, or a cron expression like `0 12 * * *` for 12:00 UTC).
 
@@ -127,8 +128,10 @@ You can run the same logic as a **scheduled serverless function** on Netlify (no
 
 ## Configuration
 
-- `CHECK_INTERVAL`: How often to check for new posts (in milliseconds). Default is 86400000 (1 day = 24 hours). (Local bot only.)
-- `FORUM_URL`: The forum URL to monitor. Default is the Wicked News category.
+- `FORUM_URL` and `CHECK_INTERVAL` are hardcoded constants in the code:
+  - `FORUM_URL`: `https://forum.norestforthewicked.com/c/no-rest-for-the-wicked/5` (Wicked News category)
+  - `CHECK_INTERVAL`: `86400000` (1 day = 24 hours) - for local bot only
+- To change these values, edit the constants in `src/config.ts` (local bot) or `netlify/functions/post-latest-topic.mjs` (Netlify function)
 
 ## How It Works
 
