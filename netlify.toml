@@ -1,0 +1,13 @@
+# Netlify config for forum → Discord bot (scheduled function only)
+
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+# Optional: override schedule here instead of in function code
+# [functions."post-latest-topic"]
+# schedule = "@daily"
+
+# Node version for functions (axios is bundled by esbuild)
+[functions]
+  node_bundler = "esbuild"

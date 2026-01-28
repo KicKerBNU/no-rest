@@ -1,0 +1,27 @@
+{
+  "name": "no-rest-forum-bot",
+  "version": "1.0.0",
+  "description": "Bot to monitor No Rest For The Wicked forum and post new posts to Discord",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts"
+  },
+  "keywords": ["discord", "bot", "forum", "monitor"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "axios": "^1.6.7",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.4.1"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.8.2",
+    "@types/node": "^20.11.5",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+}
