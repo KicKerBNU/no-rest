@@ -16,7 +16,8 @@
     "discord.js": "^14.14.1",
     "axios": "^1.6.7",
     "cheerio": "^1.0.0-rc.12",
-    "dotenv": "^16.4.1"
+    "dotenv": "^16.4.1",
+    "form-data": "^4.0.0"
   },
   "devDependencies": {
     "@netlify/functions": "^2.8.2",

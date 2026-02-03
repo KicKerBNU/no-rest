@@ -120,11 +120,32 @@ You can run the same logic as a **scheduled serverless function** on Netlify (no
    
    **Note:** `FORUM_URL` is hardcoded in the function code (it's a public URL, not a secret).
 
-4. **Deploy.** The function `post-latest-topic` runs **once per day** (at midnight UTC). You can change the schedule in `netlify/functions/post-latest-topic.mjs` (`config.schedule`, e.g. `@daily`, `@hourly`, or a cron expression like `0 12 * * *` for 12:00 UTC).
+4. **Deploy.** The function `post-latest-topic` runs **once per day** at 19:30 Brasilia time (22:30 UTC). You can change the schedule in `netlify/functions/post-latest-topic.mjs` (`config.schedule`, e.g. cron `30 22 * * *`).
 
 5. **Test:** In Netlify dashboard go to **Functions** → select `post-latest-topic` → **Run now**.
 
+**Important — Scheduled run uses deployed code:** The 19:30 (Brasilia) message is sent by whatever version of the function is **currently deployed** on Netlify. It does **not** use the code on your machine. If you changed the code and only ran `node test-function.mjs` locally, the scheduled run will still use the old version until you **redeploy**:
+
+- **If the site is connected to Git:** Push your changes (`git push`), then Netlify will build and deploy automatically. Wait for the deploy to finish.
+- **Or:** In Netlify dashboard → **Deploys** → **Trigger deploy** → **Deploy site** (this redeploys the last commit; commit and push first if you have new local changes).
+
+After a successful deploy, the next scheduled run (and “Run now” in the dashboard) will use the new behavior (full content, file attachment, sections).
+
 **Note:** On Netlify the bot runs as a scheduled function only (no long-lived process). For running 24/7 with a custom interval, use the local bot (`npm run dev` / `npm start`).
+
+## Patch notes in Discord
+
+The bot fetches the **full topic content** from the forum and posts it to Discord in a structured way so users don’t need to open the website. Each post includes:
+
+- **Overview** – intro text from the patch notes
+- **Sections** – Loot, Balance, Input, Audio, Tutorialization, Bug Fixes (with bullet lists)
+
+**Workaround for Discord’s 6,000-char limit:** The bot does two things so you can read everything without opening the website:
+
+1. **Full post as a file** – The first message includes an attachment **`patch-notes.txt`** with the complete post. Open or download it in Discord to read the full patch notes with no character limit.
+2. **Multiple messages** – Long posts are also split across several messages (each under 6,000 chars of embeds) so you can scroll and read in the channel. The first embed says “Full patch notes attached as a file above” and includes a “Full post: [link]” footer.
+
+So you get the full content in Discord either by opening the attached file or by reading the follow-up messages.
 
 ## Configuration
 
@@ -135,11 +156,11 @@ You can run the same logic as a **scheduled serverless function** on Netlify (no
 
 ## How It Works
 
-1. The bot fetches the forum page HTML
-2. Parses the HTML to extract post information (title, URL, author, replies, views, activity)
-3. Gets the latest (first) topic from the list
-4. Creates a Discord embed with the topic information and posts it to the configured channel
-5. Repeats this process at the configured interval (default: once per day)
+1. The bot fetches the forum category and picks the latest (non-pinned) topic
+2. Fetches the full topic content from the Discourse API
+3. Parses the post into sections (Overview, Loot, Balance, Input, Audio, Tutorialization, Bug Fixes)
+4. Builds one or more Discord embeds: a table with topic info (author, replies, views, activity) plus each section as readable bullet lists
+5. Posts to the configured channel (scheduled daily on Netlify, or at the configured interval for the local bot)
 
 ## Troubleshooting
 
