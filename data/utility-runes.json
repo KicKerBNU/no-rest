@@ -1,0 +1,178 @@
+[
+  {
+    "name": "Blink",
+    "category": "Mobility",
+    "cost": "25 Focus",
+    "effects": ["Teleport forward ~4 meters, passing through enemies to reposition or evade hits."],
+    "description": "Harness sacred energy to instantly dash forward.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/1742791377702654896"
+  },
+  {
+    "name": "Channel",
+    "category": "Focus",
+    "cost": "Charging Cost: 30 Focus",
+    "effects": ["Sacrifice a small amount of health to gain +2 Focus while channeling."],
+    "description": "Converts health into raw focus by drawing in sacred energy.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/2260878218614060253"
+  },
+  {
+    "name": "Cold Enchantment",
+    "category": "Enchantment",
+    "cost": "50 Focus",
+    "effects": ["Imbues your weapon with cold damage, slowing struck enemies."],
+    "description": "Coats your weapon with frost to chill foes.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/4157409531145223832"
+  },
+  {
+    "name": "Cold Resistance",
+    "category": "Resistance",
+    "cost": "50 Focus",
+    "effects": ["+25% Ice Resistance for 120 seconds."],
+    "description": "Fortifies you against cold-based attacks.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/1686901208604993696"
+  },
+  {
+    "name": "Damage Surge",
+    "category": "Offense",
+    "cost": "100 Focus",
+    "effects": ["+20% overall damage dealt for 120 seconds."],
+    "description": "Temporarily amplifies your attack power.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/4541316365676769348"
+  },
+  {
+    "name": "Electric Enchantment",
+    "category": "Enchantment",
+    "cost": "50 Focus",
+    "effects": ["Imbues your weapon with lightning damage that can shock foes."],
+    "description": "Charges weapon strikes with electricity.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/588068954941947977"
+  },
+  {
+    "name": "Electric Resistance",
+    "category": "Resistance",
+    "cost": "50 Focus",
+    "effects": ["+25% Lightning Resistance for 120 seconds."],
+    "description": "Enhances protection against lightning and shock.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/2216413228396767658"
+  },
+  {
+    "name": "Focus Halo",
+    "category": "Focus",
+    "cost": "100 Focus",
+    "effects": ["+100 maximum Focus for 120 seconds."],
+    "description": "Temporarily increases your focus pool to fuel more spells.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/969122126482669651"
+  },
+  {
+    "name": "Heal",
+    "category": "Recovery",
+    "cost": "50 Focus",
+    "effects": ["Restores 40 Health instantly."],
+    "description": "Spend focus to mend wounds on demand.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/4384702748080131279"
+  },
+  {
+    "name": "Heal Aura",
+    "category": "Recovery",
+    "cost": "Charging Cost: 20 Focus",
+    "effects": ["Converts focus into +2 Health per pulse while channeling a healing field."],
+    "description": "Creates a restorative aura that heals you over time.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/2252989086070227011"
+  },
+  {
+    "name": "Heat Enchantment",
+    "category": "Enchantment",
+    "cost": "50 Focus",
+    "effects": ["Adds fire damage to weapon attacks, scorching enemies."],
+    "description": "Envelops your weapon in flames.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/4367213926817392495"
+  },
+  {
+    "name": "Heat Resistance",
+    "category": "Resistance",
+    "cost": "50 Focus",
+    "effects": ["+25% Fire Resistance for 120 seconds."],
+    "description": "Reduces incoming fire and heat damage.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/274893645292724916"
+  },
+  {
+    "name": "Illuminate",
+    "category": "Utility",
+    "cost": "25 Focus",
+    "effects": ["Summons a light that follows you, revealing dark areas."],
+    "description": "Creates a mobile light source to explore gloomy spaces.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/3128125765326475670"
+  },
+  {
+    "name": "Plague Enchantment",
+    "category": "Enchantment",
+    "cost": "50 Focus",
+    "effects": ["Adds plague damage build-up to weapon strikes."],
+    "description": "Coats your weapon in a virulent affliction.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/930723931439290273"
+  },
+  {
+    "name": "Plague Resistance",
+    "category": "Resistance",
+    "cost": "50 Focus",
+    "effects": ["+25% Plague Resistance for 120 seconds."],
+    "description": "Mitigates toxin and plague-based damage.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/2090540623822852819"
+  },
+  {
+    "name": "Poise Shield",
+    "category": "Defense",
+    "cost": "100 Focus",
+    "effects": ["+200% Poise for 120 seconds, greatly reducing stagger."],
+    "description": "Bolsters your stability against incoming blows.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/3655060827570716740"
+  },
+  {
+    "name": "Pulse of Health",
+    "category": "Recovery",
+    "cost": "100 Focus",
+    "effects": ["+25 flat Health instantly and +20% max Health for 120 seconds."],
+    "description": "Restores health and temporarily increases your maximum vitality.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/4438847146502021167"
+  },
+  {
+    "name": "Repair",
+    "category": "Utility",
+    "cost": "150 Focus",
+    "effects": ["Restores 25 Durability to equipped items."],
+    "description": "Channels energy to repair and maintain your gear mid-mission.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/2942758767993469102"
+  },
+  {
+    "name": "Return",
+    "category": "Traversal",
+    "cost": "25 Focus",
+    "effects": ["Fast travel to any unlocked Cerim Whisper."],
+    "description": "Instantly warp back to a discovered waypoint.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/448234635234904088"
+  },
+  {
+    "name": "Scream",
+    "category": "Crowd Control",
+    "cost": "50 Focus",
+    "effects": ["Unleashes a cone shout dealing physical damage, +300% kickback, knocks down enemies up to 6m when charged."],
+    "description": "Projects a staggering roar that topples foes.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/2917299912740972188"
+  },
+  {
+    "name": "Stamina Wellspring",
+    "category": "Stamina",
+    "cost": "100 Focus",
+    "effects": ["+30% Stamina for 120 seconds."],
+    "description": "Expands your stamina reserves for more actions.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/3873937807161689394"
+  },
+  {
+    "name": "Thorns",
+    "category": "Defense",
+    "cost": "50 Focus",
+    "effects": ["+80% Thorns for 120 seconds, reflecting damage to attackers."],
+    "description": "Creates a retaliatory barrier that punishes hits.",
+    "sourceUrl": "https://www.norestforthewicked.gg/db/runes/4227377370616330604"
+  }
+]

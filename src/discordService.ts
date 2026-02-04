@@ -1,5 +1,15 @@
-import { Client, GatewayIntentBits, TextChannel, EmbedBuilder } from 'discord.js';
-import { ForumPost } from './types.js';
+import {
+  ChatInputCommandInteraction,
+  Client,
+  EmbedBuilder,
+  Events,
+  GatewayIntentBits,
+  Interaction,
+  SlashCommandBuilder,
+  TextChannel,
+} from 'discord.js';
+import { ForumPost, UtilityRune } from './types.js';
+import { getUtilityRunes } from './utilityRunes.js';
 
 export class DiscordService {
   private client: Client;
@@ -16,9 +26,16 @@ export class DiscordService {
       ]
     });
 
-    this.client.once('clientReady', () => {
+    this.client.once(Events.ClientReady, async () => {
       console.log(`Discord bot logged in as ${this.client.user?.tag}`);
       this.ready = true;
+      await this.registerSlashCommands();
+    });
+
+    this.client.on(Events.InteractionCreate, (interaction) => {
+      this.handleInteraction(interaction).catch((error) => {
+        console.error('Error handling interaction:', error);
+      });
     });
 
     this.client.on('error', (error) => {
@@ -40,7 +57,7 @@ export class DiscordService {
       if (this.ready) {
         resolve();
       } else {
-        this.client.once('clientReady', () => resolve());
+        this.client.once(Events.ClientReady, () => resolve());
       }
     });
   }
@@ -93,5 +110,104 @@ export class DiscordService {
    */
   async destroy(): Promise<void> {
     await this.client.destroy();
+  }
+
+  private async registerSlashCommands(): Promise<void> {
+    if (!this.client.application) {
+      return;
+    }
+
+    const utilityCommand = new SlashCommandBuilder()
+      .setName('utility')
+      .setDescription('List or search No Rest for the Wicked utility runes')
+      .addStringOption((option) =>
+        option
+          .setName('query')
+          .setDescription('Filter by rune name or category (e.g. "Blink", "resistance")')
+          .setRequired(false)
+      );
+
+    await this.client.application.commands.set([utilityCommand.toJSON()]);
+    console.log('Registered slash commands: /utility');
+  }
+
+  private async handleInteraction(interaction: Interaction): Promise<void> {
+    if (!interaction.isChatInputCommand()) {
+      return;
+    }
+
+    if (interaction.commandName === 'utility') {
+      await this.handleUtilityCommand(interaction);
+    }
+  }
+
+  private async handleUtilityCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+    const query = interaction.options.getString('query') ?? undefined;
+
+    if (query) {
+      const matches = getUtilityRunes(query);
+      if (!matches.length) {
+        await interaction.reply({
+          content: `I couldn't find a utility rune that matches **${query}**.\nTry a different name or run \`/utility\` with no filters to see everything.`,
+          ephemeral: true,
+        });
+        return;
+      }
+
+      const rune = matches[0];
+      const embed = this.buildRuneDetailEmbed(rune);
+      await interaction.reply({ embeds: [embed] });
+      return;
+    }
+
+    const runes = getUtilityRunes();
+    const embeds = this.buildRuneSummaryEmbeds(runes);
+    await interaction.reply({ embeds });
+  }
+
+  private buildRuneDetailEmbed(rune: UtilityRune): EmbedBuilder {
+    const effects = rune.effects.length > 0 ? rune.effects.map((line) => `• ${line}`).join('\n') : 'See description for details.';
+    return new EmbedBuilder()
+      .setTitle(`${rune.name} — Utility Rune`)
+      .setURL(rune.sourceUrl)
+      .setDescription(rune.description)
+      .setColor(0x2b6cb0)
+      .addFields(
+        { name: 'Category', value: rune.category, inline: true },
+        { name: 'Cost', value: rune.cost, inline: true },
+        { name: 'Effects', value: effects }
+      )
+      .setFooter({ text: 'Data source: NoRestForTheWicked.gg (Utility Rune database)' })
+      .setTimestamp();
+  }
+
+  private buildRuneSummaryEmbeds(runes: UtilityRune[]): EmbedBuilder[] {
+    const chunkSize = 10;
+    const embeds: EmbedBuilder[] = [];
+    for (let i = 0; i < runes.length; i += chunkSize) {
+      const slice = runes.slice(i, i + chunkSize);
+      const embed = new EmbedBuilder()
+        .setTitle('No Rest For The Wicked • Utility Runes')
+        .setColor(0x5865f2)
+        .setDescription('Use `/utility query:<name>` to see detailed stats for a single rune.');
+
+      slice.forEach((rune) => {
+        const summary = [
+          `Category: ${rune.category}`,
+          `Cost: ${rune.cost}`,
+          rune.effects[0] ? `Effect: ${rune.effects[0]}` : rune.description,
+        ].join('\n');
+
+        embed.addFields({
+          name: rune.name,
+          value: summary,
+        });
+      });
+
+      embed.setFooter({ text: 'Source: NoRestForTheWicked.gg' });
+      embeds.push(embed);
+    }
+
+    return embeds;
   }
 }

@@ -14,3 +14,12 @@ export interface Config {
   forumUrl: string;
   checkInterval: number;
 }
+
+export interface UtilityRune {
+  name: string;
+  category: string;
+  cost: string;
+  effects: string[];
+  description: string;
+  sourceUrl: string;
+}

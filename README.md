@@ -8,6 +8,7 @@ A Discord bot that monitors the No Rest For The Wicked forum and automatically p
 - Automatically posts the latest topic to Discord with formatted embeds every day
 - Configurable posting interval (default: 1 day)
 - Graceful shutdown handling
+- Slash command `/utility` to surface every No Rest for the Wicked utility rune directly in Discord
 
 ## Setup
 
@@ -146,6 +147,15 @@ The bot fetches the **full topic content** from the forum and posts it to Discor
 2. **Multiple messages** – Long posts are also split across several messages (each under 6,000 chars of embeds) so you can scroll and read in the channel. The first embed says “Full patch notes attached as a file above” and includes a “Full post: [link]” footer.
 
 So you get the full content in Discord either by opening the attached file or by reading the follow-up messages.
+
+## Utility rune lookup (`/utility`)
+
+When you run the bot locally, it now registers a slash command called `/utility`:
+
+- `/utility` with **no arguments**: returns a catalog of all 22 utility runes from *No Rest for the Wicked*, showing the category, focus cost, and signature effect for each rune.
+- `/utility query:<name>`: shares the detailed entry for a single rune (for example `/utility query:Blink`).
+
+The data lives in `data/utility-runes.json` and was compiled from the [NoRestForTheWicked.gg utility rune database](https://www.norestforthewicked.gg/db/runes?type=utility), which mirrors the official client. Update that JSON file whenever new runes ship, then restart the bot so the slash command picks up the fresh data.
 
 ## Configuration
 
