@@ -3,25 +3,24 @@
  * Handles POSTs from Discord: PING and APPLICATION_COMMAND (/utility).
  * Set "Interactions Endpoint URL" in Discord Developer Portal to:
  *   https://<your-site>.netlify.app/.netlify/functions/discord-interactions
+ *
+ * GET returns 200 + message so you can confirm the URL is reachable.
  */
 
-import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import nacl from 'tweetnacl';
 
-function hexToBuffer(hex) {
-  return Buffer.from(hex, 'hex');
+function hexToUint8Array(hex) {
+  return new Uint8Array(Buffer.from(hex, 'hex'));
 }
 
+/** Verify Discord request using tweetnacl (Discord's recommended approach). */
 function verifySignature(rawBody, signatureHex, timestamp, publicKeyHex) {
-  const key = crypto.createPublicKey({
-    key: hexToBuffer(publicKeyHex),
-    format: 'raw',
-    type: 'ed25519',
-  });
-  const message = Buffer.from(timestamp + rawBody, 'utf8');
-  const signature = hexToBuffer(signatureHex);
-  return crypto.verify('ed25519', message, key, signature);
+  const message = new TextEncoder().encode(timestamp + rawBody);
+  const signature = hexToUint8Array(signatureHex);
+  const publicKey = hexToUint8Array(publicKeyHex);
+  return nacl.sign.detached.verify(message, signature, publicKey);
 }
 
 function loadRunes() {
@@ -143,35 +142,64 @@ async function getRawBodyAndMethod(reqOrEvent) {
 
 export default async function handler(reqOrEvent) {
   const { rawBody, method } = await getRawBodyAndMethod(reqOrEvent);
+
+  // GET: health check so you can confirm the endpoint URL is reachable
+  if (method === 'GET') {
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        message: 'Discord interactions endpoint is live. Use POST for Discord.',
+        url: 'https://discord.com/developers/applications → General Information → Interactions Endpoint URL',
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   if (method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
   }
 
+  const signature = getHeader(reqOrEvent, 'x-signature-ed25519');
+  const timestamp = getHeader(reqOrEvent, 'x-signature-timestamp');
+  console.log('[discord-interactions] POST', {
+    bodyLength: (rawBody || '').length,
+    hasSignature: Boolean(signature),
+    hasTimestamp: Boolean(timestamp),
+  });
+
   let publicKey = process.env.DISCORD_PUBLIC_KEY;
   if (!publicKey) {
-    console.error('DISCORD_PUBLIC_KEY is not set');
+    console.error('[discord-interactions] DISCORD_PUBLIC_KEY is not set in Netlify env');
     return new Response(
       JSON.stringify({ error: 'Server misconfiguration' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
   publicKey = publicKey.trim().replace(/\s/g, '');
+  if (publicKey.length !== 64) {
+    console.error('[discord-interactions] DISCORD_PUBLIC_KEY must be 64 hex chars, got', publicKey.length);
+    return new Response(
+      JSON.stringify({ error: 'Invalid DISCORD_PUBLIC_KEY length' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
 
-  const signature = getHeader(reqOrEvent, 'x-signature-ed25519');
-  const timestamp = getHeader(reqOrEvent, 'x-signature-timestamp');
   if (!signature || !timestamp) {
+    console.log('[discord-interactions] Missing signature or timestamp → 401');
     return new Response('Unauthorized', { status: 401 });
   }
 
   let valid = false;
   try {
-    valid = verifySignature(rawBody, signature.trim(), timestamp, publicKey);
+    valid = verifySignature(rawBody || '', signature.trim(), timestamp, publicKey);
   } catch (err) {
-    console.error('Signature verification error:', err.message);
+    console.error('[discord-interactions] Verify error:', err.message);
   }
   if (!valid) {
+    console.log('[discord-interactions] Invalid signature → 401');
     return new Response('Invalid request signature', { status: 401 });
   }
+  console.log('[discord-interactions] Verified, handling interaction');
 
   let body;
   try {

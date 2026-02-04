@@ -209,6 +209,27 @@ The data lives in `data/utility-runes.json` and is **updated automatically** fro
 
 - The bot is designed to post the latest topic every day, even if it's the same topic. This is intentional behavior - it ensures you always see the most recent topic in your Discord channel.
 
+### Discord doesn't accept the Interactions Endpoint URL
+
+If Discord shows "The specified interactions endpoint url could not be verified":
+
+1. **Confirm the endpoint is reachable**  
+   Open in a browser:  
+   `https://no-rest.netlify.app/.netlify/functions/discord-interactions`  
+   You should see a JSON response like `{"ok":true,"message":"Discord interactions endpoint is live..."}`. If you get 404 or an error, the function isn’t deployed or the URL is wrong.
+
+2. **Check Netlify environment variables**  
+   In Netlify → Site configuration → Environment variables, ensure **`DISCORD_PUBLIC_KEY`** is set. Value must be the **Public Key** from [Discord Developer Portal](https://discord.com/developers/applications) → your app → **General Information** (64 hex characters, no spaces or newlines).
+
+3. **Check Netlify function logs**  
+   When you click **Save** on the Interactions Endpoint URL in Discord, Netlify runs the function. In Netlify → Functions → **discord-interactions** → **Logs**, look for:
+   - `DISCORD_PUBLIC_KEY is not set` → add the env var and redeploy.
+   - `Invalid signature` or `Verify error` → public key is wrong or the request body was altered; double-check you copied the full Public Key (64 hex chars).
+   - `Verified, handling interaction` → verification passed; if Discord still rejects, try saving the URL again after a redeploy.
+
+4. **Redeploy after changing env vars**  
+   Changing environment variables in Netlify usually requires a new deploy (e.g. **Trigger deploy** → **Deploy site**) for the function to see them.
+
 ### Rate Limiting
 
 - The bot includes delays between posts to avoid Discord rate limits
