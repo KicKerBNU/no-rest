@@ -7,7 +7,9 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "fetch-utility-runes": "node scripts/fetch-utility-runes.mjs",
+    "register-discord-commands": "node scripts/register-discord-commands.mjs"
   },
   "keywords": ["discord", "bot", "forum", "monitor"],
   "author": "",

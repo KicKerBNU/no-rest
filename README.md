@@ -118,12 +118,27 @@ You can run the same logic as a **scheduled serverless function** on Netlify (no
 3. **Set environment variables** (Site settings → Environment variables):
    - `DISCORD_TOKEN` – your Discord bot token
    - `DISCORD_CHANNEL_ID` – target channel ID
+   - `DISCORD_PUBLIC_KEY` – your application’s **Public Key** (for the `/utility` Interactions endpoint; see below)
    
    **Note:** `FORUM_URL` is hardcoded in the function code (it's a public URL, not a secret).
 
-4. **Deploy.** The function `post-latest-topic` runs **once per day** at 19:30 Brasilia time (22:30 UTC). You can change the schedule in `netlify/functions/post-latest-topic.mjs` (`config.schedule`, e.g. cron `30 22 * * *`).
+4. **Enable `/utility` on Netlify (Interactions Endpoint):**
+   - In [Discord Developer Portal](https://discord.com/developers/applications) → your application → **General Information**.
+   - Copy the **Public Key** and set it in Netlify as `DISCORD_PUBLIC_KEY`.
+   - Under **Interactions Endpoint URL**, set:
+     - `https://<your-netlify-site-name>.netlify.app/.netlify/functions/discord-interactions`
+   - Save changes.
+   - Register the slash command **once** (from your machine or CI) so Discord shows `/utility`:
+     ```bash
+     export DISCORD_APPLICATION_ID=<your Application ID from Developer Portal>
+     export DISCORD_TOKEN=<your bot token>
+     npm run register-discord-commands
+     ```
+   - After that, `/utility` in your Discord server will be handled by the Netlify function (no local bot needed).
 
-5. **Test:** In Netlify dashboard go to **Functions** → select `post-latest-topic` → **Run now**.
+5. **Deploy.** The function `post-latest-topic` runs **once per day** at 19:30 Brasilia time (22:30 UTC). You can change the schedule in `netlify/functions/post-latest-topic.mjs` (`config.schedule`, e.g. cron `30 22 * * *`).
+
+6. **Test:** In Netlify dashboard go to **Functions** → select `post-latest-topic` → **Run now**.
 
 **Important — Scheduled run uses deployed code:** The 19:30 (Brasilia) message is sent by whatever version of the function is **currently deployed** on Netlify. It does **not** use the code on your machine. If you changed the code and only ran `node test-function.mjs` locally, the scheduled run will still use the old version until you **redeploy**:
 
@@ -150,12 +165,21 @@ So you get the full content in Discord either by opening the attached file or by
 
 ## Utility rune lookup (`/utility`)
 
-When you run the bot locally, it now registers a slash command called `/utility`:
+The slash command `/utility` works in two ways:
+
+- **Local bot:** When you run the bot locally (`npm run dev` or `npm start`), it registers `/utility` and handles it via the Discord gateway.
+- **Netlify (no local bot):** If you set the **Interactions Endpoint URL** in the Discord Developer Portal to your Netlify function URL and set `DISCORD_PUBLIC_KEY` in Netlify, then run `npm run register-discord-commands` once (with `DISCORD_APPLICATION_ID` and `DISCORD_TOKEN`), `/utility` is handled by the Netlify function. You don’t need your machine running.
+
+Behavior:
 
 - `/utility` with **no arguments**: returns a catalog of all 22 utility runes from *No Rest for the Wicked*, showing the category, focus cost, and signature effect for each rune.
 - `/utility query:<name>`: shares the detailed entry for a single rune (for example `/utility query:Blink`).
 
-The data lives in `data/utility-runes.json` and was compiled from the [NoRestForTheWicked.gg utility rune database](https://www.norestforthewicked.gg/db/runes?type=utility), which mirrors the official client. Update that JSON file whenever new runes ship, then restart the bot so the slash command picks up the fresh data.
+The data lives in `data/utility-runes.json` and is **updated automatically** from the [NoRestForTheWicked.gg utility rune database](https://www.norestforthewicked.gg/db/runes?type=utility):
+
+- **Monthly:** A GitHub Action runs on the 1st of every month (00:00 UTC), fetches the latest utility runes from the site, and commits `data/utility-runes.json` if anything changed. No manual edits needed.
+- **Manual run:** In the repo go to **Actions** → **Update utility runes** → **Run workflow** to refresh the list on demand.
+- **Local script:** You can also run `npm run fetch-utility-runes` to update the file on your machine and then commit the change yourself.
 
 ## Configuration
 
