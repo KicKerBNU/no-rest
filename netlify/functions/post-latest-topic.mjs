@@ -1,10 +1,12 @@
 /**
- * Netlify Scheduled Function: Fetches latest topic from forum, posts to Discord (with full content as file attachment).
+ * Netlify Scheduled Function: Fetches latest topic from forum, posts to Discord only if it's new.
  * Runs daily (config in netlify.toml or export config below).
+ * Uses Netlify Blobs to remember the last posted topic ID so we don't repost the same topic.
  */
 
 import axios from 'axios';
 import FormData from 'form-data';
+import { getStore } from '@netlify/blobs';
 
 // Constants - these are public configuration values, not secrets
 const FORUM_BASE = 'https://forum.norestforthewicked.com';
@@ -272,6 +274,9 @@ async function postToDiscord(post) {
   }
 }
 
+const BLOB_STORE_NAME = 'forum-bot';
+const LAST_POSTED_KEY = 'last-posted-topic-id';
+
 export default async function handler(req) {
   try {
     let body = {};
@@ -279,6 +284,9 @@ export default async function handler(req) {
       if (req && typeof req.json === 'function') body = await req.json();
     } catch (_) {}
     console.log('post-latest-topic invoked, next_run:', body.next_run);
+
+    const store = getStore({ name: BLOB_STORE_NAME });
+    const lastPostedTopicId = await store.get(LAST_POSTED_KEY);
 
     const post = await fetchLatestTopic();
     if (!post) {
@@ -289,6 +297,20 @@ export default async function handler(req) {
       });
     }
 
+    if (lastPostedTopicId !== null && String(lastPostedTopicId) === String(post.topicId)) {
+      console.log('No new post — latest topic already posted:', post.title);
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          skipped: true,
+          reason: 'no new post',
+          latestTopicId: post.topicId,
+          title: post.title,
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Fetch topic body and parse into sections for Discord
     const topicContent = await fetchTopicContent(post.slug, post.topicId);
     if (topicContent) {
@@ -297,10 +319,11 @@ export default async function handler(req) {
     }
 
     await postToDiscord(post);
-    console.log('Posted to Discord:', post.title);
+    await store.set(LAST_POSTED_KEY, String(post.topicId));
+    console.log('Posted to Discord:', post.title, '— saved topicId', post.topicId);
 
     return new Response(
-      JSON.stringify({ ok: true, title: post.title, url: post.url }),
+      JSON.stringify({ ok: true, title: post.title, url: post.url, topicId: post.topicId }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (err) {

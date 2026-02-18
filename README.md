@@ -136,7 +136,7 @@ You can run the same logic as a **scheduled serverless function** on Netlify (no
      ```
    - After that, `/utility` in your Discord server will be handled by the Netlify function (no local bot needed).
 
-5. **Deploy.** The function `post-latest-topic` runs **once per day** at 19:30 Brasilia time (22:30 UTC). You can change the schedule in `netlify/functions/post-latest-topic.mjs` (`config.schedule`, e.g. cron `30 22 * * *`).
+5. **Deploy.** The function `post-latest-topic` runs **once per day** at 19:30 Brasilia time (22:30 UTC). It **posts to Discord only when the latest forum topic is new** (i.e. different from the one last posted). The last posted topic ID is stored in [Netlify Blobs](https://docs.netlify.com/blobs/overview/) so the check persists across runs. You can change the schedule in `netlify/functions/post-latest-topic.mjs` (`config.schedule`, e.g. cron `30 22 * * *`).
 
 6. **Test:** In Netlify dashboard go to **Functions** → select `post-latest-topic` → **Run now**.
 
@@ -194,7 +194,7 @@ The data lives in `data/utility-runes.json` and is **updated automatically** fro
 2. Fetches the full topic content from the Discourse API
 3. Parses the post into sections (Overview, Loot, Balance, Input, Audio, Tutorialization, Bug Fixes)
 4. Builds one or more Discord embeds: a table with topic info (author, replies, views, activity) plus each section as readable bullet lists
-5. Posts to the configured channel (scheduled daily on Netlify, or at the configured interval for the local bot)
+5. Posts to the configured channel (on Netlify: scheduled daily, and only when there is a new topic; locally: at the configured interval)
 
 ## Troubleshooting
 
